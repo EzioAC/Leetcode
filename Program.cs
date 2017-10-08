@@ -274,6 +274,7 @@ namespace Leetcode
         }
 
 
+        //...
         public int Trap(int[] height) 
         {
             if(height.Length==0)
@@ -311,6 +312,7 @@ namespace Leetcode
             return answer;
         }
 
+        //转成数组 小学乘法步骤
         public static string Multiply(string num1, string num2) 
         {
             int[] result = new int[num1.Length+num2.Length];
