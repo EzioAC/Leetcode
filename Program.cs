@@ -10,7 +10,7 @@ namespace Leetcode
     {
         static void Main(string[] args)
         {
-            Solution.CanJump(new int[]{2,3,1,1,4});
+            Console.WriteLine("!");
         }
     }
 
@@ -433,7 +433,7 @@ namespace Leetcode
         }
         
         //看数型，找规律。
-        public static void NextPermutation(int[] nums) 
+        public void NextPermutation(int[] nums) 
         {
             int i=nums.Length-1;
             for(;i>=1;i--)
@@ -513,7 +513,8 @@ namespace Leetcode
             return false;
         }
 
-        public IList<Interval> Merge(IList<Interval> intervals) {
+        public IList<Interval> Merge(IList<Interval> intervals) 
+        {
             //画重点（LINQ） nlgn
             var res = intervals.OrderBy(p=>p.start).ToList();
             int index = 0;
@@ -530,6 +531,85 @@ namespace Leetcode
                 }
             }
             return res;
+        }
+
+        //leetcode过不了,传递的数组是fixed-size的.自己手动复制再处理返回....
+        //O(n)时间复杂度.做个o(lgn)二分怕是也行...
+        public IList<Interval> Insert(IList<Interval> intervals, Interval newInterval) 
+        {
+            if(intervals.Count==0||intervals.Last().end<newInterval.start)
+            {
+                intervals.Add(newInterval);
+                return intervals;
+            }
+            for(int i=0;i<intervals.Count;i++)
+            {
+                //要不i里面 要不i前面
+                if(newInterval.start<=intervals[i].end)
+                {
+                    if(newInterval.start<intervals[i].start)
+                        intervals.Insert(i,newInterval);
+                    else
+                        intervals[i].end = Math.Max(intervals[i].end,newInterval.end);
+                    int end = intervals[i].end;
+                    for(int j=i+1;j<intervals.Count;j++)
+                    {
+                        if(intervals[j].end<=end)
+                        {
+                            intervals.RemoveAt(j);
+                            j--;
+                        }
+                        else if(intervals[j].start>end)
+                            break;
+                        else if(intervals[j].end>end)
+                        {
+                            intervals[i].end = intervals[j].end;
+                            intervals.RemoveAt(j);
+                            j--;
+                        }
+                    }
+                    break;
+                }
+            }
+            return intervals;
+        }
+
+        public int LengthOfLastWord(string s) 
+        {
+            s = s.Trim();
+            int len = 0;
+            if(s.Length==0)
+                return len;
+            var cs = s.ToCharArray();
+            for(int i = cs.Length-1;i>=0;i--)
+            {
+                if(cs[i]==' ')
+                {
+                    break;
+                }
+                else
+                {
+                    len++;
+                }
+            }
+            return len;
+        }
+
+        public string GetPermutation(int n, int k) 
+        {
+            int[] nums = new int[n];
+            for(int i = 0;i<=n;i++)
+            {
+                nums[i]=i+1;
+            }
+            for(int i=0;i<k;i++)
+                NextPermutation(nums);
+            StringBuilder sb =new StringBuilder();
+            for(int i = 0;i<=n;i++)
+            {
+                sb.Append(nums[i].ToString());
+            }
+            return sb.ToString();
         }
    }
 }
