@@ -10,7 +10,7 @@ namespace Leetcode
     {
         static void Main(string[] args)
         {
-            Solution.Multiply("111","123");
+            Solution.CanJump(new int[]{2,3,1,1,4});
         }
     }
 
@@ -350,5 +350,186 @@ namespace Leetcode
             }
             return sb.ToString();
         }
-    }
+
+        //在步程之内找最远点 循环～～
+        public int Jump(int[] nums) 
+        {
+            if(nums.Length<2)
+                return 0;
+            int steps=0,currentMax=0,i=0,nextMax=0;
+
+	        while(currentMax-i+1>0)
+            {	
+		        steps++;
+		        for(;i<=currentMax;i++){
+			        nextMax=Math.Max(nextMax,nums[i]+i);
+			    if(nextMax>=nums.Length-1)return steps;  
+		    }
+		    currentMax=nextMax;
+	        }
+	        return 0;
+        }
+
+        
+        static bool[] check;
+        static IList<IList<int>> answer;
+
+        //这算回溯
+        //还是递归爽！
+        public static IList<IList<int>> Permute(int[] nums) 
+        {
+            answer = new List<IList<int>>();
+            check = new bool[nums.Length];
+            Helper(new int[nums.Length],0,ref nums);
+            return answer;
+        }
+
+        public static void Helper(int[] num,int index,ref int[] nums)
+        {
+            if(index==num.Length)
+            {
+                answer.Add((int[])num.Clone());
+                return;
+            }
+            for(int i=0;i<num.Length;i++)
+            {
+                if(check[i])
+                    continue;
+                check[i]=true;
+                num[index] = nums[i];
+                Helper(num,index+1,ref nums);
+                check[i]=false;
+            }
+        }
+
+        public static IList<IList<int>> PermuteUnique(int[] nums) 
+        {
+            Array.Sort(nums);
+            answer = new List<IList<int>>();
+            check = new bool[nums.Length];
+            Helper2(new int[nums.Length],0,ref nums);
+            return answer;
+        }
+
+        public static void Helper2(int[] num,int index,ref int[] nums)
+        {
+            if(index==num.Length)
+            {
+                answer.Add((int[])num.Clone());
+                return;
+            }
+            for(int i=0;i<num.Length;i++)
+            {
+                if(check[i]||(
+                    //和I就多了这个判断 和 排序
+                (i>0)&&(nums[i]==nums[i-1])&&!check[i]&&!check[i-1]
+                ))
+                    continue;
+                check[i]=true;
+                num[index] = nums[i];
+                Helper2(num,index+1,ref nums);
+                check[i]=false;
+            }
+        }
+        
+        //看数型，找规律。
+        public static void NextPermutation(int[] nums) 
+        {
+            int i=nums.Length-1;
+            for(;i>=1;i--)
+            {
+                if(nums[i]>nums[i-1])
+                {
+                    int j=i;
+                    while(j<nums.Length&&nums[j]>nums[i-1])  
+                        j++;
+                    swap(nums,i-1,j-1);
+                    break;
+                }
+            }
+            for(int j=nums.Length-1;i<j;j--,i++)    
+                swap(nums,i,j);//reverse array
+        }
+    
+        public static void swap(int[] nums, int i, int j){
+            int temp = nums[i];
+            nums[i] = nums[j];
+            nums[j] = temp;
+        }
+
+
+        //排序转成同一个顺序
+        public IList<IList<string>> GroupAnagrams(string[] strs) 
+        {
+            Dictionary<String,IList<String>> res = new Dictionary<string, IList<string>>();
+            foreach(var str in strs)
+            {
+                var cs = str.ToCharArray();
+                Array.Sort(cs);
+                String key = new string(cs);
+                if(!res.ContainsKey(key))
+                {
+                    res[key] = new List<string>();
+                }
+                res[key].Add(str);
+            }
+            IList<IList<string>> answer = new List<IList<string>>();
+            foreach(var s in res.Keys)
+            {
+                answer.Add(res[s]);
+            }
+            return answer;
+            
+        }
+
+        public double MyPow(double x, int n) 
+        {
+            double temp=x;
+            if(n==0)
+                return 1;
+            temp=MyPow(x,n/2);
+            if(n%2==0)
+                return temp*temp;
+            else 
+            {
+            if(n > 0)
+                return x*temp*temp;
+            else
+                return (temp*temp)/x;
+            }
+        }
+
+        public static bool CanJump(int[] nums) 
+        {
+            int nextmax=0;
+            for(int i =0 ; i<nums.Length ;i++)
+            {
+                if(i>nextmax)
+                    return false;
+                nextmax = Math.Max(nextmax,i+nums[i]);
+                if(nextmax>=nums.Length-1)
+                    return true;
+            }
+            return false;
+        }
+
+        public IList<Interval> Merge(IList<Interval> intervals) {
+            //画重点（LINQ） nlgn
+            var res = intervals.OrderBy(p=>p.start).ToList();
+            int index = 0;
+            while(index<res.Count-1)
+            {
+                if(res[index].end>=res[index+1].start)
+                {
+                    res[index].end = Math.Max(res[index+1].end,res[index].end);
+                    res.RemoveAt(index+1);
+                }
+                else
+                {
+                    index++;
+                }
+            }
+            return res;
+        }
+   }
 }
