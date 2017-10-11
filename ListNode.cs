@@ -1,3 +1,5 @@
+namespace Leetcode
+{
     public class ListNode 
     {
         public int val;
@@ -7,3 +9,4 @@
              val = x; 
         }
     }
+}

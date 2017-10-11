@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Leetcode;
 
 namespace Leetcode
@@ -10,7 +11,7 @@ namespace Leetcode
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("!");
+            Solution.MinPathSum(new int[,]{{1,2},{1,1}});
         }
     }
 
@@ -370,94 +371,6 @@ namespace Leetcode
 	        return 0;
         }
 
-        
-        static bool[] check;
-        static IList<IList<int>> answer;
-
-        //这算回溯
-        //还是递归爽！
-        public static IList<IList<int>> Permute(int[] nums) 
-        {
-            answer = new List<IList<int>>();
-            check = new bool[nums.Length];
-            Helper(new int[nums.Length],0,ref nums);
-            return answer;
-        }
-
-        public static void Helper(int[] num,int index,ref int[] nums)
-        {
-            if(index==num.Length)
-            {
-                answer.Add((int[])num.Clone());
-                return;
-            }
-            for(int i=0;i<num.Length;i++)
-            {
-                if(check[i])
-                    continue;
-                check[i]=true;
-                num[index] = nums[i];
-                Helper(num,index+1,ref nums);
-                check[i]=false;
-            }
-        }
-
-        public static IList<IList<int>> PermuteUnique(int[] nums) 
-        {
-            Array.Sort(nums);
-            answer = new List<IList<int>>();
-            check = new bool[nums.Length];
-            Helper2(new int[nums.Length],0,ref nums);
-            return answer;
-        }
-
-        public static void Helper2(int[] num,int index,ref int[] nums)
-        {
-            if(index==num.Length)
-            {
-                answer.Add((int[])num.Clone());
-                return;
-            }
-            for(int i=0;i<num.Length;i++)
-            {
-                if(check[i]||(
-                    //和I就多了这个判断 和 排序
-                (i>0)&&(nums[i]==nums[i-1])&&!check[i]&&!check[i-1]
-                ))
-                    continue;
-                check[i]=true;
-                num[index] = nums[i];
-                Helper2(num,index+1,ref nums);
-                check[i]=false;
-            }
-        }
-        
-        //看数型，找规律。
-        public void NextPermutation(int[] nums) 
-        {
-            int i=nums.Length-1;
-            for(;i>=1;i--)
-            {
-                if(nums[i]>nums[i-1])
-                {
-                    int j=i;
-                    while(j<nums.Length&&nums[j]>nums[i-1])  
-                        j++;
-                    swap(nums,i-1,j-1);
-                    break;
-                }
-            }
-            for(int j=nums.Length-1;i<j;j--,i++)    
-                swap(nums,i,j);//reverse array
-        }
-    
-        public static void swap(int[] nums, int i, int j){
-            int temp = nums[i];
-            nums[i] = nums[j];
-            nums[j] = temp;
-        }
-
-
         //排序转成同一个顺序
         public IList<IList<string>> GroupAnagrams(string[] strs) 
         {
@@ -595,21 +508,122 @@ namespace Leetcode
             return len;
         }
 
-        public string GetPermutation(int n, int k) 
+        //O(n)
+        public ListNode RotateRight(ListNode head, int k) 
         {
-            int[] nums = new int[n];
-            for(int i = 0;i<=n;i++)
-            {
-                nums[i]=i+1;
+            int count = 0;
+            ListNode temp = head;
+            //统计个数&成环
+            while(true)
+            {   
+                if(temp==null)
+                {
+                    return null;    
+                }
+                count++;
+                if(temp.next == null)
+                {
+                    temp.next = head;
+                    break;
+                }
+                temp = temp.next;
             }
-            for(int i=0;i<k;i++)
-                NextPermutation(nums);
-            StringBuilder sb =new StringBuilder();
-            for(int i = 0;i<=n;i++)
+            //避免k过大
+            k%=count;
+            //断环
+            int a = count - k;
+            temp = head;
+            while(a>1)
             {
-                sb.Append(nums[i].ToString());
+                temp = temp.next;
+                a--;
             }
-            return sb.ToString();
+            var answer = temp.next;
+            temp.next = null;
+            return answer;
+        }   
+
+        //DP 
+        //dp[i,j] = dp[i-1,j]+dp[i,j-1];
+        public static int UniquePaths(int m, int n) 
+        {
+            int[,] dp = new int[m+1,n+1];
+            for(int i = 1;i<m+1;i++)
+            {
+                for(int j = 1;j<n+1;j++)
+                {
+                    if(i==1&&j==1)
+                    {
+                        dp[1,1] = 1;
+                    }
+                    else
+                    {
+                        dp[i,j] = dp[i-1,j]+dp[i,j-1];
+                    }
+                }
+            }
+            return dp[m,n];
+        }
+
+        public int UniquePathsWithObstacles(int[,] obstacleGrid) 
+        {
+            int m = obstacleGrid.GetLength(0);
+            int n = obstacleGrid.GetLength(1);           
+            if(m<1||n<1||obstacleGrid[0,0]==1)
+                return 0; 
+            int[,] dp = new int[m+1,n+1];
+            for(int i = 1;i<m+1;i++)
+            {
+                for(int j = 1;j<n+1;j++)
+                {
+                    if(i==1&&j==1)
+                    {
+                        dp[1,1] = 1;
+                    }
+                    else
+                    {
+                        if(obstacleGrid[i-1,j-1]==0)
+                            dp[i,j] = dp[i-1,j]+dp[i,j-1];
+                    }
+                }
+            }
+            return dp[m,n];
+        }
+        
+        public static int MinPathSum(int[,] grid) 
+        {
+            int m = grid.GetLength(0);
+            int n = grid.GetLength(1);
+            if(m==1&&n==1)
+                return grid[0,0];
+            int[,] dp = new int[m,n];
+            for(int i = 0;i<m;i++)
+            {
+                for(int j =0;j<n;j++)
+                {
+                    if(i==0&&j==0)
+                    {
+                        dp[i,j] = grid[i,j];
+                    }
+                    else if(i==0)
+                    {
+                        dp[i,j] = grid[i,j]+dp[i,j-1];
+                    }
+                    else if(j==0)
+                    {
+                        dp[i,j] = grid[i,j]+(dp[i-1,j]);
+                    }
+                    else
+                        dp[i,j] = grid[i,j]+Math.Min(dp[i-1,j],dp[i,j-1]);
+                }
+            }
+            return dp[m-1,n-1];
+        }
+
+
+        //这道题很操蛋!!
+        public bool IsNumber(string s) {
+            return System.Text.RegularExpressions.Regex.IsMatch(s.TrimStart().TrimEnd(),@"^[\ ]*[+-]?(\d+\.?\d*|\d*\.?\d+)(e[+-]?\d+)?[\ ]*$");
         }
    }
 }

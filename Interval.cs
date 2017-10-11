@@ -1,3 +1,5 @@
+namespace Leetcode
+{
     public class Interval 
     {
         public int start;
@@ -13,3 +15,4 @@
             end = e; 
         }   
     }
+}
