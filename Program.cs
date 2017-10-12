@@ -11,7 +11,7 @@ namespace Leetcode
     {
         static void Main(string[] args)
         {
-            Solution.MinPathSum(new int[,]{{1,2},{1,1}});
+            Solution.SimplifyPath("/...");
         }
     }
 
@@ -625,5 +625,177 @@ namespace Leetcode
         public bool IsNumber(string s) {
             return System.Text.RegularExpressions.Regex.IsMatch(s.TrimStart().TrimEnd(),@"^[\ ]*[+-]?(\d+\.?\d*|\d*\.?\d+)(e[+-]?\d+)?[\ ]*$");
         }
+
+
+        //麻烦...
+        public static string AddBinary(string a, string b) 
+        {
+            char[] cs_a = a.ToCharArray();
+            char[] cs_b = b.ToCharArray();
+            int index_a = cs_a.Length-1;
+            int index_b = cs_b.Length-1;
+            bool[] answer = new bool[Math.Max(cs_a.Length,cs_b.Length)+1];
+            for(int i = answer.Length-1;i>0;i--)
+            {
+                bool b1,b2;
+                if(index_a<0)
+                {
+                    b1 = false;
+                }
+                else
+                {
+                    b1 = cs_a[index_a]=='1';
+                }
+                index_a--;           
+                if(index_b<0)
+                {
+                    b2 = false;
+                }
+                else
+                {
+                    b2 = cs_b[index_b]=='1';
+                }
+                index_b--;
+                if(answer[i])
+                {
+                    if(b1&&b2) answer[i-1] = true;
+                    else if(!b1&&!b2);
+                    else
+                    {
+                        answer[i-1] = true;
+                        answer[i] = false;
+                    }
+                }
+                else
+                {
+                    if(b1&&b2) answer[i-1] = true;
+                    else if(!b1&&!b2);
+                    else
+                    {
+                        answer[i] = true;
+                    }
+                }
+            }
+            StringBuilder sb = new StringBuilder();
+            if(answer.Length==1)
+                return answer[0]?"1":"0";
+            if(answer[0])
+            {
+                sb.Append("1");
+            }
+            for(int i = 1;i<answer.Length;i++)
+            {
+                sb.Append(answer[i]?"1":"0");
+            }
+            return sb.ToString();
+        }
+
+        //麻烦...
+        public static IList<string> FullJustify(string[] words, int maxWidth) {
+            IList<string> answer = new List<string>();
+            IList<string> temp = new List<string>();
+            StringBuilder sb = new StringBuilder();
+            int count = 0;
+            for(int x=0;x<words.Length;x++)
+            {
+                if(count+words[x].Length+temp.Count<=maxWidth)
+                {
+                    count+=words[x].Length;
+                    temp.Add(words[x]);
+                }
+                else if(temp.Count==1)
+                {
+                    sb.Append(temp[0]);
+                    while(sb.Length<maxWidth)
+                    {
+                        sb.Append(" ");
+                    }
+                    answer.Add(sb.ToString());
+                    sb.Clear();
+                    temp.Clear();
+                    count=0;
+                    x--;
+                }
+                else
+                {
+                    x--;
+                    int[] interval =  new int[temp.Count-1];
+                    int left = maxWidth - count;
+                    int t = left/interval.Length;
+                    for(int i = 0;i<interval.Length;i++)
+                    {
+                        interval[i] = t;
+                        left-=t;
+                    }
+                    int index = 0;
+                    while(left>0)
+                    {
+                        interval[index++]++;
+                        index%=interval.Length;
+                        left--;
+                    }
+                    for(int i =0;i<temp.Count-1;i++)
+                    {
+                        sb.Append(temp[i]);
+                        for(int j = 0;j<interval[i];j++)
+                            sb.Append(" ");
+                    }
+                    sb.Append(temp[temp.Count-1]);
+                    answer.Add(sb.ToString());
+                    sb.Clear();
+                    temp.Clear();
+                    count=0;
+                }
+            }
+            for(int i =0;i<temp.Count;i++)
+            {
+                sb.Append(temp[i]);
+                if(temp.Count-1!=i)
+                sb.Append(" ");
+            }
+            while(sb.Length<maxWidth)
+            {
+                sb.Append(" ");
+            }
+            answer.Add(sb.ToString());
+            return answer;
+        }
+
+        //烦!
+        public static string SimplifyPath(string path) {
+            int start = 0;
+            Stack<string> stack = new Stack<string>();
+            var cs = path.ToCharArray();
+            StringBuilder sb = new StringBuilder();
+            for(int i =0;i<cs.Length;i++)
+            {
+                if(cs[i]=='/'||i==cs.Length-1)
+                {
+                    if(cs[i]!='/')
+                        sb.Append(cs[i]);
+                    var temp = sb.ToString();
+                    sb.Clear();
+                    if(temp=="..")
+                        {
+                            if(stack.Any())
+                                stack.Pop();
+                        }
+                    else if(temp!="."&&temp!="")
+                    {
+                        stack.Push(temp);
+                    }
+                }
+                else
+                {
+                    sb.Append(cs[i]);
+                }
+            }
+            sb.Clear();
+            while(stack.Any())
+                //要不自己翻过了用append?
+                sb.Insert(0,"/"+stack.Pop());
+            return sb.ToString()!=""?sb.ToString():"/";
+        }
+
    }
 }
