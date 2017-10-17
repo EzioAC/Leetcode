@@ -12,7 +12,7 @@ namespace Leetcode
         static void Main(string[] args)
         {
             Solution temp = new Solution();
-            temp.SearchMatrix(new int[,]{{1,1}},0);
+            temp.MergeTwoLists(new ListNode(1){next =  new ListNode(3)},new ListNode(2));
         }
     }
 
@@ -796,12 +796,13 @@ namespace Leetcode
 
 
         //保存第一个的坐标，用它所在的行和列来该行或列是否要清零 o(1)space
-        public void SetZeroes(int[,] matrix) {
-            int y=-1,x=-1;
+        public void SetZeroes(int[,] matrix)
+        {
+            int y = -1, x = -1;
             bool first = true;
-            for(int j=0;j<matrix.GetLength(0);j++)
+            for (int j = 0; j < matrix.GetLength(0); j++)
             {
-                for(int i=0;i<matrix.GetLength(1);i++)
+                for (int i = 0; i < matrix.GetLength(1); i++)
                 {
                     if (matrix[j, i] == 0)
                     {
@@ -819,69 +820,577 @@ namespace Leetcode
                     }
                 }
             }
-            if(y<0&&x<0)
+            if (y < 0 && x < 0)
                 return;
-            for(int i=0;i<matrix.GetLength(1);i++)
+            for (int i = 0; i < matrix.GetLength(1); i++)
             {
-                if(i==x)
+                if (i == x)
                     continue;
-                else if(matrix[y,i]==0)
+                else if (matrix[y, i] == 0)
                 {
-                    for(int j=0;j<matrix.GetLength(0);j++)
+                    for (int j = 0; j < matrix.GetLength(0); j++)
                     {
-                        matrix[j,i]=0;
+                        matrix[j, i] = 0;
                     }
                 }
             }
-            for(int j=0;j<matrix.GetLength(0);j++)
+            for (int j = 0; j < matrix.GetLength(0); j++)
             {
-                if(j==y)
+                if (j == y)
                     continue;
-                else if(matrix[j,x]==0)
+                else if (matrix[j, x] == 0)
                 {
-                    for(int i=0;i<matrix.GetLength(1);i++)
+                    for (int i = 0; i < matrix.GetLength(1); i++)
                     {
-                        matrix[j,i]=0;
+                        matrix[j, i] = 0;
                     }
                 }
             }
-            for(int i=0;i<matrix.GetLength(1);i++)
+            for (int i = 0; i < matrix.GetLength(1); i++)
             {
-                matrix[y,i]=0;
+                matrix[y, i] = 0;
             }
-            for(int j=0;j<matrix.GetLength(0);j++)
+            for (int j = 0; j < matrix.GetLength(0); j++)
             {
-                matrix[j,x]=0;
+                matrix[j, x] = 0;
             }
         }
 
 
         //二分 O(lgn*m)
-        public bool SearchMatrix(int[,] matrix, int target) {
+        public bool SearchMatrix(int[,] matrix, int target)
+        {
             int y = matrix.GetLength(0);
             int x = matrix.GetLength(1);
-            if(x==0||y==0)
+            if (x == 0 || y == 0)
                 return false;
             int l = 0;
-            int r = x*y-1;
-            while(r-l>1)
+            int r = x * y - 1;
+            while (r - l > 1)
             {
-                int mid = (l+r)/2;
-                int value = matrix[mid/x,mid%x];
-                if(value==target)
+                int mid = (l + r) / 2;
+                int value = matrix[mid / x, mid % x];
+                if (value == target)
                     return true;
-                else if(value>target)
+                else if (value > target)
                 {
                     r = mid;
                 }
                 else
                 {
-                    l=mid;
+                    l = mid;
                 }
             }
-            if(matrix[l/x,l%x]==target||matrix[r/x,r%x]==target)
+            if (matrix[l / x, l % x] == target || matrix[r / x, r % x] == target)
                 return true;
             return false;
+        }
+
+        public void SortColors(int[] nums) 
+        {
+            int left = 0;
+            int right = nums.Length - 1;
+            for (int i=0; i<=right; i++) {
+                while (nums[i]==2 && i<right) Swap(ref nums[i], ref nums[right--]);
+                while (nums[i]==0 && i>left) Swap(ref nums[i], ref nums[left++]);
+            }
+        }
+
+        private void Swap(ref int a,ref int b)
+        {
+            int temp = b;
+            b = a;
+            a = temp;
+        }
+
+        //参考版..
+        public string MinWindow(string s, string t)
+        {
+            if (s == "" || t == "" || s.Length < t.Length)
+            {
+                return "";
+            }
+            int count = t.Length;
+            int[] require = new int[128];
+            bool[] chSet = new bool[128];
+            for (int index = 0; index < count; ++index)
+            {
+                require[t[index]]++;
+                chSet[t[index]] = true;
+            }
+            int i = -1;
+            int j = 0;
+            int minLen = int.MaxValue;
+            int minIdx = 0;
+            while (i < s.Length && j < s.Length)
+            {
+                if (count > 0)
+                {
+                    if (i == s.Length - 1)
+                        break;
+                    i++;
+                    require[s[i]]--;
+                    if (chSet[s[i]] && require[s[i]] >= 0)
+                    {
+                        count--;
+                    }
+                }
+                else
+                {
+                    if (minLen > i - j + 1)
+                    {
+                        minLen = i - j + 1;
+                        minIdx = j;
+                    }
+                    require[s[j]]++;
+                    if (chSet[s[j]] && require[s[j]] > 0)
+                    {
+                        count++;
+                    }
+                    j++;
+                }
+            }
+            if (minLen == int.MaxValue)
+            {
+                return "";
+            }
+            return s.Substring(minIdx, minLen);
+        }
+
+        IList<IList<int>> answer;
+        int[] arr;
+        public IList<IList<int>> Combine(int n, int k) {
+            answer = new List<IList<int>>();
+            arr = new int[k];
+            GetCombine(1,n,0);
+            return answer;
+        }
+
+        private void GetCombine(int l,int r,int n)
+        {
+            if(n==arr.Length)
+            {
+                answer.Add(arr.Clone() as int[]);
+                return;
+            }
+            if(l>r)
+                return;
+            for(int i=l;i<=r;i++)
+            {
+                arr[n] = i;
+                GetCombine(i+1,r,n+1);
+            }
+        }
+
+        public IList<IList<int>> Subsets(int[] nums) {
+            answer = new List<IList<int>>();
+            for(int i = 0;i<nums.Length;i++)
+            {
+                arr = new int[i];
+                GetSubsets(0,nums.Length-1,0,nums);
+            }
+            answer.Add(nums);
+            return answer;
+        }
+
+        private void GetSubsets(int l,int r,int n,int[] nums)
+        {
+            if(n==arr.Length)
+            {
+                answer.Add(arr.Clone() as int[]);
+                return;
+            }
+            if(l>r)
+                return;
+            for(int i=l;i<=r;i++)
+            {
+                arr[n] = nums[i];
+                GetSubsets(i+1,r,n+1,nums);
+            }
+        }
+
+        public bool Exist(char[,] board, string word) {
+            if(word.Length==0)
+                return false;
+            var cs = word.ToCharArray();
+            for(int y = 0;y<board.GetLength(0);y++)
+            {
+                for(int x=0;x<board.GetLength(1);x++)
+                {
+                    if(board[y,x]==word[0])
+                    {
+                        board[y,x] = '!';
+                        if(BT_Exist(board,cs,x,y,1))
+                            return true;
+                        board[y,x] = word[0];
+                    }
+                }
+            }
+            return false;
+        }
+
+        int[] delta_x = new int[]{-1,0,1,0};
+        int[] delta_y = new int[]{0,1,0,-1};
+        private bool BT_Exist(char[,] board,char[] word,int x,int y,int index)
+        {
+            if(index==word.Length)
+                return true;
+            for(int i =0;i<4;i++)
+            {
+                int tempx = x+delta_x[i];
+                int tempy = y+delta_y[i];
+                if(tempx>=0&&tempx<board.GetLength(1)&&tempy>=0&&tempy<board.GetLength(0)&&board[tempy,tempx]==word[index])
+                {
+                    board[tempy,tempx]=  '!';
+                    if(BT_Exist(board,word,tempx,tempy,index+1))
+                        return true;
+                    board[tempy,tempx] = word[index];
+                }
+            }
+            return false;
+        } 
+
+        public IList<string> FindWords(char[,] board, string[] words) 
+        {
+            IList<string> answer = new List<string>();
+            TrieNode trie = TrieNode.buildTrie(words);
+            for(int y = 0;y<board.GetLength(0);y++)
+            {
+                for(int x = 0;x<board.GetLength(1);x++)
+                {
+                    BT_FindWords(board,y,x,trie,answer);
+                }
+            }
+            return answer;
+        }
+
+        private void BT_FindWords(char[,] board, int y, int x, TrieNode node, IList<string> answer)
+        {
+            char c = board[y, x];
+            if (c == '#' || node.next[c - 'a'] == null)
+                return;
+            node = node.next[c - 'a'];
+            if (node.word != null)
+            {
+                answer.Add(node.word);
+                node.word = null;
+            }
+            board[y, x] = '#';
+            if (y > 0) BT_FindWords(board, y - 1, x, node, answer);
+            if (x > 0) BT_FindWords(board, y, x - 1, node, answer);
+            if (y < board.GetLength(0) - 1) BT_FindWords(board, y + 1, x, node, answer);
+            if (x < board.GetLength(1) - 1) BT_FindWords(board, y, x + 1, node, answer);
+            board[y, x] = c;
+        }
+
+        public int RemoveDuplicates(int[] nums) 
+        {
+            int index = 1;
+            int count = 0;
+            if(nums.Length==0)
+                return count;
+            int num = nums[0];
+            count++;
+            while(index<nums.Length)
+            {
+                if(nums[index]==num)
+                {
+                    nums[count] = num;
+                    count++;
+                    while(index<nums.Length&&nums[index]==num)
+                    {
+                        index++;
+                    }
+                }
+                else
+                {
+                    num = nums[index];
+                    nums[count] = num;
+                    count++;
+                    index++;
+                }
+            }  
+            return count;
+        }
+
+        public bool Search2(int[] nums, int target) 
+        {
+            int start = 0, end = nums.Length - 1, mid = -1;
+            while (start <= end)
+            {
+                mid = (start + end) / 2;
+                if (nums[mid] == target)
+                {
+                    return true;
+                }
+                if (nums[mid] < nums[end] || nums[mid] < nums[start])
+                {
+                    if (target > nums[mid] && target <= nums[end])
+                    {
+                        start = mid + 1;
+                    }
+                    else
+                    {
+                        end = mid - 1;
+                    }
+                }
+                else if (nums[mid] > nums[start] || nums[mid] > nums[end])
+                {
+                    if (target < nums[mid] && target >= nums[start])
+                    {
+                        end = mid - 1;
+                    }
+                    else
+                    {
+                        start = mid + 1;
+                    }
+                }
+                else
+                {
+                    end--;
+                }
+            }
+            return false;
+        }
+
+        public ListNode DeleteDuplicates(ListNode head) 
+        {
+            ListNode curr = head;
+            //避免head被消掉。。
+            ListNode start = new ListNode(0); 
+            //answer.next是结果的起点
+            ListNode answer = start;
+            while(curr!=null)
+            {
+                if(start.next==null)
+                {
+                    start.next = curr;
+                }
+                else if(start.next.val==curr.val)
+                {
+                    int val = curr.val;
+                    while(curr!=null&&curr.val==val)
+                        curr = curr.next;
+                    start.next = null;
+                    continue;
+                }
+                else
+                {
+                    start = start.next;
+                    start.next = curr;
+                }
+                curr = curr.next;
+            }
+            return answer.next;
+        }
+
+        public int LargestRectangleArea(int[] heights) {
+            //用stack保存成阶梯型计算～
+            Stack<int> stack = new Stack<int>();
+            int width = 0;
+            int temp = 0;
+            int max = 0;
+            for(int i=0;i<=heights.Length;i++)
+            {
+                //最后收尾计算面积
+                if(i==heights.Length)
+                {
+                    width=0;
+                    while(stack.Any())
+                    {
+                        width++;
+                        temp = stack.Pop();
+                        max =Math.Max(temp*width,max);
+                    }
+                }
+                //添加
+                else if(!stack.Any()||stack.Peek()<heights[i])
+                    stack.Push(heights[i]);
+                //前面有较大的计算面积后变小保存
+                else
+                {
+                    width = 0;
+                    while(stack.Any()&&stack.Peek()>heights[i])
+                    {
+                        width++;
+                        temp = stack.Pop();
+                        max =Math.Max(temp*width,max);
+                    }
+                    while (width + 1 != 0)
+                    {
+                        width--;
+                        stack.Push(heights[i]);
+                    }
+                }
+            }
+            return max;
+        }
+
+
+        
+        public int MaximalRectangle(char[,] matrix) {
+            int[,] height = new int[matrix.GetLength(0),matrix.GetLength(1)];
+            for(int y = 0;y<height.GetLength(0);y++)
+            {
+                for(int x = 0;x<height.GetLength(1);x++)
+                {
+                    if(matrix[y,x]=='1')
+                    {
+                        height[y,x] = 1;
+                        if(y-1>=0)
+                            height[y,x]+=height[y-1,x];
+                    }
+                    else
+                    {
+                        height[y,x] = 0;
+                    }
+                }
+            }
+            //同上题
+            Stack<int> stack = new Stack<int>();
+            int width = 0;
+            int temp = 0;
+            int max = 0;
+            for (int y = 0; y < height.GetLength(0); y++)
+            {
+                for (int x = 0; x <= height.GetLength(1); x++)
+                {
+                    //最后收尾计算面积
+                    if (x == height.GetLength(1))
+                    {
+                        width = 0;
+                        while (stack.Any())
+                        {
+                            width++;
+                            temp = stack.Pop();
+                            max = Math.Max(temp * width, max);
+                        }
+                    }
+                    //添加
+                    else if (!stack.Any() || stack.Peek() < height[y, x])
+                        stack.Push(height[y, x]);
+                    //前面有较大的计算面积后变小保存
+                    else
+                    {
+                        width = 0;
+                        while (stack.Any() && stack.Peek() > height[y, x])
+                        {
+                            width++;
+                            temp = stack.Pop();
+                            max = Math.Max(temp * width, max);
+                        }
+                        while (width + 1 != 0)
+                        {
+                            width--;
+                            stack.Push(height[y, x]);
+                        }
+                    }
+                }
+            }
+            return max;
+        }
+
+        public ListNode Partition(ListNode head, int x) 
+        {
+            ListNode less = new ListNode(0);
+            ListNode head_less = less;
+            ListNode left = new ListNode(0);
+            ListNode head_left = left;
+            left.next = head;
+            var temp = left;
+            while(temp.next != null)
+            {
+                if(temp.next.val<x)
+                {
+                    less.next = temp.next;
+                    less = less.next;
+                    temp.next = temp.next.next;
+                }
+                else
+                    temp = temp.next;
+            }
+            less.next = head_left.next;
+            return head_less.next;
+        }
+
+        public bool IsScramble(string s1, string s2) {
+            if(s1.Length!=s2.Length)
+                return false;
+            if(s1==s2)
+                return true;
+            int l = s1.Length;
+            var cs1 = s1.ToCharArray();
+            var cs2 = s2.ToCharArray();
+            //长度，s1的其实位置,s2的其实位置
+            bool[,,] dp = new bool[l+1,l,l];
+            for(int i = 1;i<=l;i++)
+            {
+                for(int y=0;y<=l-i;y++)
+                {
+                    for(int x = 0;x<=l-i;x++)
+                    {
+                        if(i==1)
+                        {
+                            dp[i,y,x]=cs1[y]==cs2[x];
+                        }
+                        else
+                        {
+                            //有n-1种拆分方法～
+                            for(int j=1;j<i;j++)
+                            {
+                                //一种是没置换的，另一种是置换的..
+                                if((dp[j,y,x]&&dp[i-j,y+j,x+j])||(dp[j,y+i-j,x]&&dp[i-j,y,x+j]))
+                                {
+                                    dp[i,y,x] = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return dp[l,0,0];
+        }
+
+        public void Merge(int[] nums1, int m, int[] nums2, int n) 
+        {
+            int index = m+n-1;
+            int index_1 = m-1;
+            int index_2 = n-1;
+            while(index_1>-1&&index_2>-1)
+                nums1[index--] = nums1[index_1]>=nums2[index_2]?nums1[index_1--]:nums2[index_2--];
+            while(index_2>-1)
+                nums1[index--] = nums2[index_2--];
+        }
+
+        public ListNode MergeTwoLists(ListNode l1, ListNode l2) {
+            ListNode curr = new ListNode(0);
+            ListNode answer = curr;
+            ListNode index1 = l1;
+            ListNode index2 = l2;
+            while(l1!=null&&l2!=null)
+            {
+                if(l1.val<=l2.val)
+                {
+                    curr.next = l1;
+                    l1 = l1.next;
+                }
+                else
+                {
+                    curr.next = l2;
+                    l2 = l2.next;
+                }
+                curr = curr.next;
+            }
+            if(l1==null)
+            {
+                curr.next = l2;
+            }
+            if(l2==null)
+            {
+                curr.next = l1;
+            }
+            return answer.next;
         }
     }
 }
