@@ -1828,5 +1828,119 @@ namespace Leetcode {
             return dp[s1.Length,s2.Length];
         }
 
+        public bool HasAlternatingBits(int n)
+        {
+            if (n == 0) return true;
+            int m = n >> 1;
+            int k = (m ^ n) + 1;
+            while (k > 1)
+            {
+                if (k % 2 == 1)
+                    return false;
+
+                k /= 2;
+            }
+
+            return true;
+        }
+
+        public bool IsOneBitCharacter(int[] bits)
+        {
+            bool last = false;
+            for(int i = 0;i<bits.Length;i++)
+            {
+                if(i==bits.Length-1)
+                {
+                    if(last)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+                if(last)
+                {
+                    last = false;
+                }
+                else
+                {
+                    if(bits[i]==1)
+                    {
+                        last = true;
+                    }
+                    else
+                    {
+                        last =false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public int MaxAreaOfIsland(int[,] grid)
+        {
+            int area = 0;
+            int max = 0;
+            for(int y =0;y<grid.GetLength(0);y++)
+            {
+                for(int x =0;x<grid.GetLength(1);x++)
+                {
+                    if(grid[y,x]==1)
+                    {
+                    helperMAoI(grid,y,x,ref area);
+                    max = Math.Max(max,area);
+                    area = 0;
+                    }
+                }
+            }
+            return max;
+        }
+
+        public void helperMAoI(int[,] grid,int y,int x,ref int area)
+        {
+            if(grid[y,x]!=1)
+                return;
+            area++;
+            grid[y,x]=0;
+            if(y>0)
+            {
+                helperMAoI(grid,y-1,x,ref area);
+            }
+            if(x>0)
+            {
+                helperMAoI(grid,y,x-1,ref area);
+            }
+            if(y<grid.GetLength(0)-1)
+            {
+                helperMAoI(grid,y+1,x,ref area);
+            }
+            if (x < grid.GetLength(1) - 1)
+            {
+                helperMAoI(grid, y, x+1, ref area);
+            }
+        }
+
+        public int CountBinarySubstrings(string s)
+        {
+            int answer =0;
+            int pre=0;
+            int cur=1;
+            for (int i = 1; i < s.Length; i++)
+            {
+                if (s[i - 1] == s[i])
+                {
+                    cur++;
+                }
+                else
+                {
+                    pre = cur;
+                    cur = 1;
+                }
+                if (pre>=cur)
+                {
+                    answer++;
+                }
+            }
+            return answer;
+        }
 
 }}
